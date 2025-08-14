@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Barr Entertainment – Layout Clone (Demo)",
-  description: "Landing base using Next.js + Tailwind + Framer Motion"
+  title: "Excalibur – Agenzia Familiare di Eventi Ricreativi",
+  description:
+    "Excalibur è un'agenzia familiare dedicata a creare esperienze indimenticabili per eventi ricreativi, con un approccio personale e accogliente. Sito in costruzione.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
