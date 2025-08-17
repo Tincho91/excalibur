@@ -2,11 +2,13 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false); // <- para secuenciar la salida de la espada
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const measureRef = useRef<HTMLDivElement>(null); // medidor oculto
@@ -16,11 +18,16 @@ export default function MobileMenu() {
   const [menuW, setMenuW] = useState<number>(280);
   const [contentH, setContentH] = useState<number>(0);
 
-  const TOTAL = 0.38;
-  const STEP = 0.45;
-  const DELAY_EXPAND = TOTAL * STEP;
+  // timings
+  const DROP_DUR = 0.28;       // caída de la espada (rebote)
+  const EXPAND_DUR = 0.28;     // expansión/contracción del panel
+  const dropOffset = (btnSize.h || 40) + 10; // distancia que cae la espada
 
-  // Medir botón y ancho objetivo del menú
+  // espada
+  const SWORD_W = 56;
+  const SWORD_H = 56;
+
+  // medir botón + ancho objetivo
   useEffect(() => {
     const el = btnRef.current;
     if (!el) return;
@@ -38,7 +45,7 @@ export default function MobileMenu() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Medición oculta a ancho final (mantener contentH fresco cuando cambie menuW)
+  // medición oculta (a ancho final)
   useLayoutEffect(() => {
     const measure = () => {
       if (measureRef.current) setContentH(measureRef.current.scrollHeight);
@@ -53,43 +60,56 @@ export default function MobileMenu() {
     };
   }, [menuW]);
 
-  // Cerrar al click fuera
+  // cerrar al click fuera
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
       if (!wrapRef.current) return;
-      if (!wrapRef.current.contains(e.target as Node)) setOpen(false);
+      if (!wrapRef.current.contains(e.target as Node)) {
+        if (open) {
+          // secuenciar cierre: primero menú, luego espada
+          setIsClosing(true);
+          setOpen(false);
+          setTimeout(() => setIsClosing(false), EXPAND_DUR * 1000);
+        }
+      }
     };
     document.addEventListener("click", onDocClick);
     return () => document.removeEventListener("click", onDocClick);
-  }, []);
+  }, [open]);
 
-  // Variants: 1) baja btnH+10, 2) expande width/height; cierre exacto inverso
+  // panel: sin desplazarse (ya nace a la altura de la espada), solo expande width/height tras el drop
   const menuVariants = useMemo(
     () => ({
       initial: {
         opacity: 0,
-        y: 0,
+        y: dropOffset,
         width: btnSize.w || 80,
         height: btnSize.h || 40,
-        borderRadius: 16,
       },
       animate: {
-        opacity: [0, 1, 1],
-        y: [0, (btnSize.h || 40) + 10, (btnSize.h || 40) + 10],
-        width: [btnSize.w || 80, btnSize.w || 80, menuW],
-        height: [btnSize.h || 40, btnSize.h || 40, (contentH || btnSize.h || 40)],
-        transition: { duration: TOTAL, times: [0, STEP, 1], ease: "easeOut" },
+        opacity: 1,
+        y: dropOffset,
+        width: [btnSize.w || 80, menuW],
+        height: [btnSize.h || 40, contentH || (btnSize.h || 40)],
+        transition: {
+          delay: DROP_DUR, // esperar a que la espada caiga
+          duration: EXPAND_DUR,
+          ease: "easeOut",
+        },
         transitionEnd: { height: "auto" },
       },
       exit: {
-        opacity: [1, 1, 0],
-        y: [(btnSize.h || 40) + 10, (btnSize.h || 40) + 10, 0],
-        width: [menuW, btnSize.w || 80, btnSize.w || 80],
-        height: [(contentH || btnSize.h || 40), btnSize.h || 40, btnSize.h || 40],
-        transition: { duration: TOTAL, times: [0, 1 - STEP, 1], ease: "easeIn" },
+        opacity: [1, 0.9, 0],
+        y: dropOffset,
+        width: [menuW, btnSize.w || 80],
+        height: [contentH || (btnSize.h || 40), btnSize.h || 40],
+        transition: {
+          duration: EXPAND_DUR, // el panel se va primero
+          ease: "easeIn",
+        },
       },
     }),
-    [btnSize.w, btnSize.h, menuW, contentH]
+    [btnSize.w, btnSize.h, menuW, contentH, dropOffset]
   );
 
   return (
@@ -101,11 +121,15 @@ export default function MobileMenu() {
         aria-controls="mobile-menu"
         className="btn-ghost rounded-xl transition-transform active:scale-95 relative overflow-hidden"
         onClick={() => {
-          if (!open && measureRef.current) {
-            // Pre-medición sincrónica antes de abrir (evita salto en el primer click)
-            setContentH(measureRef.current.scrollHeight);
+          if (!open) {
+            if (measureRef.current) setContentH(measureRef.current.scrollHeight); // premedición
+            setOpen(true);
+          } else {
+            // al cerrar: primero el menú, luego la espada
+            setIsClosing(true);
+            setOpen(false);
+            setTimeout(() => setIsClosing(false), EXPAND_DUR * 1000);
           }
-          setOpen((v) => !v);
         }}
         style={btnFixedW ? { width: btnFixedW } : undefined}
       >
@@ -139,7 +163,7 @@ export default function MobileMenu() {
         </span>
       </button>
 
-      {/* Medidor oculto para pre‑calcular contentH a ancho final */}
+      {/* Medidor oculto para pre-calcular contentH a ancho final */}
       <div
         ref={measureRef}
         className="fixed -left-[9999px] -top-[9999px] py-2 px-4"
@@ -161,24 +185,60 @@ export default function MobileMenu() {
         </nav>
       </div>
 
+      {/* ESPADA: cae y rebota; el panel aparece detrás. Mantenerla visible durante cierre con `isClosing`. */}
+      <AnimatePresence>
+        {(open || isClosing) && (
+          <motion.div
+            key="sword"
+            className="absolute top-0 right-0 z-50 pointer-events-none"
+            initial={{ y: 0, opacity: 0, rotate: -2 }}
+            animate={{ y: dropOffset, opacity: 1, rotate: 0 }}
+            exit={{ y: 0, opacity: 0, rotate: -2 }}
+            transition={{
+              // Al abrir: rebote inmediato; al cerrar: retrasar salida hasta que termine el panel
+              type: open ? "spring" : "tween",
+              stiffness: open ? 520 : undefined,
+              damping: open ? 22 : undefined,
+              mass: open ? 0.6 : undefined,
+              duration: open ? DROP_DUR : DROP_DUR,
+              delay: open ? 0 : EXPAND_DUR, // <- sale DESPUÉS del panel
+              ease: open ? undefined : "easeInOut",
+            }}
+          >
+            <Image
+              src="/excaliburMobileMenu.png"
+              alt="Excalibur"
+              width={SWORD_W}
+              height={SWORD_H}
+              priority
+              className="select-none"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {open && (
           <motion.div
             id="mobile-menu"
             key="mobile-menu"
-            className="absolute top-0 right-0 z-40 overflow-hidden ring-1 ring-slate-200 shadow-lg bg-white max-w-[92vw]"
-            style={{ borderRadius: 16, transformOrigin: "top right", boxSizing: "border-box" }}
+            className="absolute top-0 right-0 z-40 overflow-hidden ring-1 ring-slate-200 shadow-lg bg-white max-w-[92vw] rounded-l-2xl rounded-br-2xl"
+            style={{
+              transformOrigin: "right center",          // <- centro vertical del borde derecho
+              boxSizing: "border-box",
+              right: SWORD_W / 2,                       // <- alinear borde derecho del panel con el centro vertical de la espada
+            }}
             initial="initial"
             animate="animate"
             exit="exit"
             variants={menuVariants}
           >
-            {/* Contenido visible: aparece cuando empieza la expansión */}
+            {/* Contenido visible: aparece cuando empieza la expansión (tras la caída) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ delay: DELAY_EXPAND, duration: 0.18, ease: "easeOut" }}
+              transition={{ delay: DROP_DUR, duration: 0.18, ease: "easeOut" }}
               className="py-2 px-4"
               style={{ width: menuW }}
             >
@@ -194,7 +254,12 @@ export default function MobileMenu() {
                   <Link
                     key={label}
                     href={href}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      // mismo patrón: primero panel, luego espada
+                      setIsClosing(true);
+                      setOpen(false);
+                      setTimeout(() => setIsClosing(false), EXPAND_DUR * 1000);
+                    }}
                     className="rounded-xl px-4 py-3 text-center text-lg font-medium hover:bg-slate-100 transition-colors"
                   >
                     {label}
