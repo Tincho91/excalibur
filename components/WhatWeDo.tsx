@@ -20,7 +20,7 @@ const items = [
 
 export default function WhatWeDo() {
   return (
-    <section id="what-we-do" className="section">
+    <section id="what-we-do" className="section relative z-0">
       <Container>
         <div className="text-center mb-10">
           <p className="uppercase tracking-widest text-amber-600 font-semibold">What we do</p>

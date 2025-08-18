@@ -25,7 +25,7 @@ export default function Navbar() {
         WebkitBackdropFilter: blur as any,
         boxShadow: shadow as any,
       }}
-      className="fixed inset-x-0 top-0 z-50 will-change-[background-color,backdrop-filter,box-shadow]"
+      className="fixed inset-x-0 top-0 z-[999] will-change-[background-color,backdrop-filter,box-shadow]"
     >
       <Container className="flex h-16 items-center justify-between transition-[height] duration-300">
         <Link href="#top" className="flex items-center gap-2 text-white">
