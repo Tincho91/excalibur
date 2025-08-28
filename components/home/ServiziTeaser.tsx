@@ -17,7 +17,7 @@ type Service = {
 const services: Service[] = [
   { key: "dj",       title: "DJ",             desc: "Selezione musicale dinamica e lettura della sala.",               img: "/serviziDJ.png" },
   { key: "vocalist", title: "Vocalist",       desc: "Voce, conduzione e coinvolgimento del pubblico.",                 img: "/serviziVocalist.png" },
-  { key: "effetti",  title: "Effetti Speciali", desc: "Fontane fredde, nuvole basse, CO₂, sparkular.",                img: "/servizieffetti.png" },
+  { key: "effetti",  title: "Effetti Speciali", desc: "Fontane fredde, nuvole basse, CO₂, sparkular.",                img: "/serviziEffetti.png" },
   { key: "luci",     title: "Luci & Visual",  desc: "Uplight, monogrammi, schermi 4K, scenografie.",                  img: "/serviziLuciVisual.png" },
   { key: "live",     title: "Musicisti Live", desc: "Sax, violino, band e voce femminile con il DJ set.",             img: "/serviziMusicisti.png" },
 ];
