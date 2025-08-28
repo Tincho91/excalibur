@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import Container from "./Container";
+import Container from "../layout/Container"
 
 export default function Hero() {
   // Config

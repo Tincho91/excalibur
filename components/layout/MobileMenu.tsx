@@ -116,7 +116,7 @@ export default function MobileMenu() {
     <div className="md:hidden relative" ref={wrapRef}>
       <button
         ref={btnRef}
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open ? "Chiudi menu" : "Apri menu"}
         aria-expanded={open}
         aria-controls="mobile-menu"
         className="btn-ghost rounded-xl transition-transform active:scale-95 relative overflow-hidden"
@@ -171,12 +171,11 @@ export default function MobileMenu() {
       >
         <nav className="flex flex-col gap-1 text-slate-700">
           {[
-            ["Home", "#top"],
-            ["Weddings", "#what-we-do"],
-            ["Photo Booths", "#services"],
-            ["Services", "#services"],
-            ["Contact", "#contact"],
-            ["About", "#why-choose"],
+            ["Home", "/"],
+            ["Wedding", "/wedding"],
+            ["Servizi", "/servizi"],
+            ["Eventi", "/eventi"],
+            ["Richiedi Preventivo", "#contatto"],
           ].map(([label]) => (
             <span key={label} className="rounded-xl px-4 py-3 text-center text-lg font-medium">
               {label}
@@ -244,18 +243,16 @@ export default function MobileMenu() {
             >
               <nav className="flex flex-col gap-1 text-slate-700">
                 {[
-                  ["Home", "#top"],
-                  ["Weddings", "#what-we-do"],
-                  ["Photo Booths", "#services"],
-                  ["Services", "#services"],
-                  ["Contact", "#contact"],
-                  ["About", "#why-choose"],
+                  ["Home", "/"],
+                  ["Wedding", "/wedding"],
+                  ["Servizi", "/servizi"],
+                  ["Eventi", "/eventi"],
+                  ["Richiedi Preventivo", "#contatto"],
                 ].map(([label, href]) => (
                   <Link
                     key={label}
                     href={href}
                     onClick={() => {
-                      // mismo patrón: primero panel, luego espada
                       setIsClosing(true);
                       setOpen(false);
                       setTimeout(() => setIsClosing(false), EXPAND_DUR * 1000);
