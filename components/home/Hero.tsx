@@ -61,7 +61,7 @@ export default function Hero() {
     >
       {/* Fondo */}
       <Image
-        src="/hero.jpg"
+        src="/heroSectionImg.png"
         alt="Hero background"
         fill
         priority

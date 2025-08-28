@@ -20,9 +20,9 @@ export default function WeddingHeroTeaser() {
             className="relative md:col-span-7"
           >
             <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden ring-1 ring-slate-200">
-              {/* Reemplaza /wedding-hero.jpg por tu imagen */}
+
               <Image
-                src="/hero.jpg"
+                src="/weddingSectionImg.png"
                 alt="Excalibur Wedding – energia in pista"
                 fill
                 className="object-cover"

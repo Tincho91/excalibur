@@ -14,8 +14,8 @@ export default function Page() {
       <ServiziTeaser />
       <Eventi />
       <Testimonials />
-      <ContactCTA />
       <ChiSiamo />
+      <ContactCTA />
     </>
   );
 }
