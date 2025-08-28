@@ -68,7 +68,7 @@ export default function EventiTeaser() {
           >
             <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden ring-1 ring-slate-200">
               <Image
-                src="/eventi.jpg" // reemplazalo con tu foto
+                src="/eventiSection.png" // reemplazalo con tu foto
                 alt="Excalibur Eventi"
                 fill
                 className="object-cover"

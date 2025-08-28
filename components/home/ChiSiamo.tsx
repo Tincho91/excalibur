@@ -1,6 +1,6 @@
 // components/home/ChiSiamo.tsx
 "use client";
-
+import Image from "next/image";
 import { motion } from "framer-motion";
 import Container from "@/components/layout/Container";
 
@@ -63,14 +63,12 @@ export default function ChiSiamo() {
             transition={{ duration: 0.5 }}
           >
             {/* Si tienes una imagen del team, reemplaza este block con <Image .../> */}
-            <div className="absolute inset-0 grid place-items-center">
-              <div className="text-center px-6">
-                <div className="text-slate-900 font-semibold text-lg">Team Excalibur</div>
-                <div className="text-slate-600 text-sm mt-1">
-                  Persone vere, passioni autentiche.
-                </div>
-              </div>
-            </div>
+            <Image
+              src="/chiSiamoSection.png" // reemplazalo con tu foto
+              alt="Excalibur Eventi"
+              fill
+              className="object-cover"
+            />
           </motion.div>
         </div>
       </Container>
